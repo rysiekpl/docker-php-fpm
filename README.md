@@ -2,6 +2,10 @@
 
 Highy configurable PHP FPM container.
 
+PHP app/pool name, username and group (along with uid and gid), app source directory, interface/port/socket PHP listens on are configurable via environment variables; as are any additional packages to be installed upon container startup.
+
+Licensed under [GNU Affero GPL](https://gnu.org/licenses/agpl.html).
+
 ## Usage
 
 This image is meant to be used with `nginx` or any other webserver that supports FastCGI
