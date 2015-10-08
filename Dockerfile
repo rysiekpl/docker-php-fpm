@@ -31,6 +31,7 @@ COPY pool.conf /etc/php5/fpm/pool.d/pool.conf
 COPY start.sh /var/lib/php5/start
 
 # make sure the PHP dir exists
+# TODO: ONBUILD?
 RUN mkdir $PHP_APP_DIR && chown $APP_USER:$APP_GROUP $PHP_APP_DIR
 
 # volumes
