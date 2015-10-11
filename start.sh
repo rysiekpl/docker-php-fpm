@@ -123,7 +123,7 @@ else
     sed -i "s/pool_name/$PHP_APP_NAME/g" /etc/php5/fpm/pool.d/$PHP_APP_NAME.conf
     sed -i "s/app_user/$PHP_APP_USER/g" /etc/php5/fpm/pool.d/$PHP_APP_NAME.conf
     sed -i "s/app_group/$PHP_APP_GROUP/g" /etc/php5/fpm/pool.d/$PHP_APP_NAME.conf
-    sed -i -r -e "s/^listen = .*$/listen = $PHP_LISTEN" /etc/php5/fpm/pool.d/$PHP_APP_NAME.conf
+    sed -i -r -e "s/^listen = .*$/listen = $PHP_LISTEN/g" /etc/php5/fpm/pool.d/$PHP_APP_NAME.conf
 fi
 
 # Change the default error log location.
