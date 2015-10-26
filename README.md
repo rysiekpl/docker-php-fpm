@@ -77,3 +77,9 @@ What interface to listen on -- compatible with the `listen` directive of the `ph
 List of packages to `apt-get install` during startup, to be used as an alternative to forking this image or using it in the Dockerfile `FROM` clause.
 
 This packages *will be installed each time the docker container is recreated*, so this will have a negative effect on container startup time!
+
+ - `PHP_ACCESS_LOG` (default: `"/dev/null"`)
+ - `PHP_ERROR_LOG` (default: `"/dev/null"`)
+ - `PHP_SLOW_LOG` (default: `"/dev/null"`)
+
+Access, [error](http://php.net/manual/en/errorfunc.configuration.php#ini.error-log), and slowlog locations, accordingly. By default all are set to `/dev/null`.

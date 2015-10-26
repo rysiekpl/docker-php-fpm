@@ -124,10 +124,13 @@ else
     sed -i "s/app_user/$PHP_APP_USER/g" /etc/php5/fpm/pool.d/$PHP_APP_NAME.conf
     sed -i "s/app_group/$PHP_APP_GROUP/g" /etc/php5/fpm/pool.d/$PHP_APP_NAME.conf
     sed -i -r -e "s/^listen = .*$/listen = $PHP_LISTEN/g" /etc/php5/fpm/pool.d/$PHP_APP_NAME.conf
+    # access and slowlog locations
+    sed -i -r -e "s/^access\.log = .*$/access.log = \"$PHP_ACCESS_LOG\"/g" /etc/php5/fpm/pool.d/$PHP_APP_NAME.conf
+    sed -i -r -e "s/^slowlog = .*$/slowlog = \"$PHP_SLOW_LOG\"/g" /etc/php5/fpm/pool.d/$PHP_APP_NAME.conf
 fi
 
-# Change the default error log location.
-sed -i "s@error_log = /var/log/php5-fpm.log@error_log = '/dev/null'@g" /etc/php5/fpm/php-fpm.conf
+# Change the default access, error, and slowlog locations.
+sed -i "s@error_log = /var/log/php5-fpm.log@error_log = '$PHP_ERROR_LOG'@g" /etc/php5/fpm/php-fpm.conf
 
 # let's run the darn thing
 exec /usr/sbin/php5-fpm -F --fpm-config /etc/php5/fpm/php-fpm.conf

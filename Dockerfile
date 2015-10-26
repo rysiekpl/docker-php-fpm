@@ -20,6 +20,9 @@ ENV PHP_APP_USER    "www-data"
 ENV PHP_APP_GROUP   "www-data"
 ENV PHP_APP_DIR     "/opt/php/"
 ENV PHP_LISTEN      "[::]:9000"
+ENV PHP_ACCESS_LOG  "/dev/null"
+ENV PHP_ERROR_LOG   "/dev/null"
+ENV PHP_SLOW_LOG    "/dev/null"
 
 # clean up the pool config directory
 RUN rm -rf /etc/php5/fpm/pool.d/*
