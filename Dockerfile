@@ -8,8 +8,8 @@ MAINTAINER Michał "rysiek" Woźniak <rysiek@hackerspace.pl>
 # FIXME: check if everything here is actually needed
 RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get -y upgrade && apt-get install -y \
   php5-fpm php5-curl php5-gd php5-imagick php5-imap php5-json php5-mcrypt php5-mysql \
-  php5-xcache php5-xmlrpc php5-xsl php5-geoip --no-install-recommends && apt-get clean && \
-  rm -rf /var/lib/apt/lists/*
+  php5-xcache php5-xmlrpc php5-xsl php5-geoip inotify-tools --no-install-recommends && \
+  apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Define environment variables.
 # Change the following to rename your app or change the user and group the app will run
