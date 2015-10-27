@@ -22,8 +22,9 @@ function watch_logfiles {
         for WATCH_FILE in "${WATCH_FILES[@]}"; do
             # if the file is not there, create
             if [ ! -e "$WATCH_FILE" ]; then
-                echo "    +-- watch file missing, creating: $WATCH_FILE"
-                touch "$WATCH_FILE"
+                echo "    +-- waiting for missing watch file: $WATCH_FILE"
+                sleep 1
+                continue
             fi
         done
         # wait for events
