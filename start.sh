@@ -27,7 +27,7 @@ function watch_logfiles {
             fi
         done
         # wait for events
-        inotifywait -r -e modify -e move -e create -e delete -qq "${WATCH_FILES[@]}"
+        inotifywait -r -e move_self -e delete_self -qq "${WATCH_FILES[@]}"
         # if a watched event occured, send the signal
         if [ $? -eq 0 ]; then
             echo "    +-- watch file changed, sending USR1 to php-fpm (pid $( cat "$PHP_PID_FILE" ))..."
