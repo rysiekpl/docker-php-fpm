@@ -4,7 +4,7 @@ Highy configurable PHP FPM container.
 
 PHP app/pool name, username and group (along with uid and gid), app source directory, interface/port/socket PHP listens on are configurable via environment variables; as are any additional packages to be installed upon container startup.
 
-The startup script makes sure to signal `php-fpm` when logfiles are deleted or moved. This can be used in conjunction with `logrotate`, with the caveat that the logrotated logfiles have to be physically *moved or deleted* for the startup script to notice. Hence, it is adviseable to *not* use `copy` or `copytruncate` [logrotate options](http://linux.die.net/man/8/logrotate); and to use the `create` option.
+The startup script makes sure to signal `php-fpm` when logfiles are deleted or moved. This can be used in conjunction with `logrotate`, with the caveat that the logrotated logfiles have to be physically *moved or deleted* for the startup script to notice. Hence, it is adviseable to *not* use `copy` or `copytruncate` [logrotate options](http://linux.die.net/man/8/logrotate); there seems to be no need to use the `create` option also, as `php-fpm` will re-create the logfiles when needed.
 
 Licensed under [GNU Affero GPL](https://gnu.org/licenses/agpl.html).
 
