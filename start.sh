@@ -19,16 +19,19 @@ function watch_logfiles {
     # loopy-loop!
     # FIXME we need to handle SIGHUP/SIGTERM/SIGKILL nicely some day
     while true; do
+	echo "    +-- checking watchfiles..."
         for WATCH_FILE in "${WATCH_FILES[@]}"; do
             # if the file is not there, create
             if [ ! -e "$WATCH_FILE" ]; then
-                echo "    +-- waiting for missing watch file: $WATCH_FILE"
+                echo "        +-- waiting for missing watch file: $WATCH_FILE"
                 sleep 1
-                continue
+                continue 2 # we want the outer loop to continue
             fi
         done
+	echo "    +-- watchfiles ok, setting the watches for ${WATCH_FILES[*]}"
         # wait for events
-        inotifywait -r -e move_self -e delete_self -qq "${WATCH_FILES[@]}"
+	echo inotifywait -e delete_self -e move_self -e unmount "${WATCH_FILES[@]}"
+        inotifywait -e delete_self -e move_self -e unmount "${WATCH_FILES[@]}"
         # if a watched event occured, send the signal
         if [ $? -eq 0 ]; then
             echo "    +-- watch file changed, sending USR1 to php-fpm (pid $( cat "$PHP_PID_FILE" ))..."
