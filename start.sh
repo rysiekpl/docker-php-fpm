@@ -19,7 +19,7 @@ function watch_logfiles {
     # loopy-loop!
     # FIXME we need to handle SIGHUP/SIGTERM/SIGKILL nicely some day
     while true; do
-        for WATCH_FILE in "$WATCH_FILES[@]"; do
+        for WATCH_FILE in "${WATCH_FILES[@]}"; do
             # if the file is not there, create
             if [ ! -e "$WATCH_FILE" ]; then
                 echo "    +-- watch file missing, creating: $WATCH_FILE"
@@ -27,7 +27,7 @@ function watch_logfiles {
             fi
         done
         # wait for events
-        inotifywait -r -e modify -e move -e create -e delete -qq "$WATCH_FILES[@]"
+        inotifywait -r -e modify -e move -e create -e delete -qq "${WATCH_FILES[@]}"
         # if a watched event occured, send the signal
         if [ $? -eq 0 ]; then
             echo "    +-- watch file changed, sending USR1 to php-fpm (pid $( cat "$PHP_PID_FILE" ))..."
@@ -180,23 +180,24 @@ else
     echo "+-- group..."
     sed -i "s/app_group/$PHP_APP_GROUP/g" /etc/php5/fpm/pool.d/$PHP_APP_NAME.conf
     echo "+-- listen..."
-    sed -i -r -e "s/^listen = .*$/listen = $PHP_LISTEN/g" /etc/php5/fpm/pool.d/$PHP_APP_NAME.conf
+    sed -i -r -e "s@^listen = .*@listen = $PHP_LISTEN@g" /etc/php5/fpm/pool.d/$PHP_APP_NAME.conf
     # access and slowlog locations
     echo "+-- access log..."
-    sed -i -r -e "s/^access\.log = .*$/access.log = \"$PHP_ACCESS_LOG\"/g" /etc/php5/fpm/pool.d/$PHP_APP_NAME.conf
+    sed -i -r -e "s@^access\.log = .*@access.log = \"$PHP_ACCESS_LOG\"@g" /etc/php5/fpm/pool.d/$PHP_APP_NAME.conf
     echo "+-- slowlog..."
-    sed -i -r -e "s/^slowlog = .*$/slowlog = \"$PHP_SLOW_LOG\"/g" /etc/php5/fpm/pool.d/$PHP_APP_NAME.conf
+    sed -i -r -e "s@^slowlog = .*@slowlog = \"$PHP_SLOW_LOG\"@g" /etc/php5/fpm/pool.d/$PHP_APP_NAME.conf
 fi
 
 # Change the default error location.
 echo "+-- error log..."
-sed -i "s@error_log = /var/log/php5-fpm.log@error_log = '$PHP_ERROR_LOG'@g" /etc/php5/fpm/php-fpm.conf
+sed -i "s@error_log = /var/log/php5-fpm.log@error_log = \"$PHP_ERROR_LOG\"@g" /etc/php5/fpm/php-fpm.conf
 
 # Change the default pidfile location.
 echo "+-- pidfile..."
-sed -i "s@pid = .*@pid = '$PHP_PID_FILE'@g" /etc/php5/fpm/php-fpm.conf
+sed -i "s@pid = .*@pid = $PHP_PID_FILE@g" /etc/php5/fpm/php-fpm.conf
 
-watch_logfiles "$PHP_ACCESS_LOG" "$PHP_ERROR_LOG" "$PHP_SLOW_LOG"
+watch_logfiles "$PHP_ACCESS_LOG" "$PHP_ERROR_LOG" "$PHP_SLOW_LOG" &
+sleep 1
 
 # let's run the darn thing
 exec /usr/sbin/php5-fpm -F --fpm-config /etc/php5/fpm/php-fpm.conf
