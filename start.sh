@@ -36,6 +36,19 @@ function watch_logfiles {
     done
 }
 
+function abort {
+    # kill php-fpm if it is running
+    [ -s $PHP_PID_FILE ] && kill -USR1 "$( cat "$PHP_PID_FILE" )"
+    # inform
+    echo
+    echo "* * * ABORTED * * *"
+    echo
+    exit 0
+}
+
+# trap whatever we need to trap
+trap abort SIGHUP SIGINT SIGQUIT SIGTERM SIGSTOP SIGKILL
+
 # we need root
 if [[ `whoami` != "root" ]]; then
   echo "we need root, and we are: $( whoami ); exiting!.."
@@ -160,19 +173,27 @@ else
     # if that file does not exist or is empty, it creates it with config from envvars
     echo "config file /etc/php5/fpm/pool.d/$PHP_APP_NAME.conf not found, setting up from PHP_* env vars!"
     mv /etc/php5/fpm/pool.d/pool.conf /etc/php5/fpm/pool.d/$PHP_APP_NAME.conf
+    echo "+-- pool name..."
     sed -i "s/pool_name/$PHP_APP_NAME/g" /etc/php5/fpm/pool.d/$PHP_APP_NAME.conf
+    echo "+-- user..."
     sed -i "s/app_user/$PHP_APP_USER/g" /etc/php5/fpm/pool.d/$PHP_APP_NAME.conf
+    echo "+-- group..."
     sed -i "s/app_group/$PHP_APP_GROUP/g" /etc/php5/fpm/pool.d/$PHP_APP_NAME.conf
+    echo "+-- listen..."
     sed -i -r -e "s/^listen = .*$/listen = $PHP_LISTEN/g" /etc/php5/fpm/pool.d/$PHP_APP_NAME.conf
     # access and slowlog locations
+    echo "+-- access log..."
     sed -i -r -e "s/^access\.log = .*$/access.log = \"$PHP_ACCESS_LOG\"/g" /etc/php5/fpm/pool.d/$PHP_APP_NAME.conf
+    echo "+-- slowlog..."
     sed -i -r -e "s/^slowlog = .*$/slowlog = \"$PHP_SLOW_LOG\"/g" /etc/php5/fpm/pool.d/$PHP_APP_NAME.conf
 fi
 
 # Change the default error location.
+echo "+-- error log..."
 sed -i "s@error_log = /var/log/php5-fpm.log@error_log = '$PHP_ERROR_LOG'@g" /etc/php5/fpm/php-fpm.conf
 
 # Change the default pidfile location.
+echo "+-- pidfile..."
 sed -i "s@pid = .*@pid = '$PHP_PID_FILE'@g" /etc/php5/fpm/php-fpm.conf
 
 watch_logfiles "$PHP_ACCESS_LOG" "$PHP_ERROR_LOG" "$PHP_SLOW_LOG"
