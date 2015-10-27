@@ -23,6 +23,7 @@ ENV PHP_LISTEN      "[::]:9000"
 ENV PHP_ACCESS_LOG  "/dev/null"
 ENV PHP_ERROR_LOG   "/dev/null"
 ENV PHP_SLOW_LOG    "/dev/null"
+ENV PHP_PID_FILE    "/var/run/php5-fpm.pid"
 
 # clean up the pool config directory
 RUN rm -rf /etc/php5/fpm/pool.d/*

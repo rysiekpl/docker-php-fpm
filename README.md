@@ -21,6 +21,7 @@ docker run \
     -e PHP_APP_GROUP=myapp_group \
     -e PHP_APP_LISTEN=/var/run/php/myapp.socket \
     -e PHP_APP_DIR=/opt/myapp/
+    -e PHP_ERROR_LOG="/var/log/myapp/error.log" \
     -e INSTALL_PACKAGES="php5-intl php5-ming" \
     -v "/path/to/code/:/opt/myapp/:ro" \
     docker-php-rpm
@@ -37,6 +38,7 @@ php.myapp:
         PHP_APP_GROUP:    "myapp_group"
         PHP_APP_LISTEN:   "/var/run/php/myapp.socket"
         PGP_APP_DIR:      "/opt/myapp/"
+        PHP_ERROR_LOG:    "/var/log/myapp/error.log"
         INSTALL_PACKAGES: "php5-intl php5-ming"
     volumes:
         - ""/path/to/code/:/opt/myapp/:ro""
@@ -83,3 +85,7 @@ This packages *will be installed each time the docker container is recreated*, s
  - `PHP_SLOW_LOG` (default: `"/dev/null"`)
 
 Access, [error](http://php.net/manual/en/errorfunc.configuration.php#ini.error-log), and slowlog locations, accordingly. By default all are set to `/dev/null`.
+
+ - `PHP_PID_FILE` (default: `"/var/run/php5-fpm.pid"`)
+
+The `php-fpm` pidfile location.

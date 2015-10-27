@@ -1,5 +1,41 @@
 #!/bin/bash
 
+# this waits for changes in files passed in params and sends php-fpm a USR1 signal to reload the logfiles
+function watch_logfiles {
+
+    # inform
+    echo "+-- watching for changes in watchfile(s):"
+
+    # get the watch files
+    unset WATCH_FILES
+    WATCH_FILES=()
+    for WATCH_FILE in "$@"; do
+        if [ ! $WATCH_FILE = "/dev/null" ]; then
+            WATCH_FILES+=("$WATCH_FILE")
+            echo "    +-- $WATCH_FILE"
+        fi
+    done
+
+    # loopy-loop!
+    # FIXME we need to handle SIGHUP/SIGTERM/SIGKILL nicely some day
+    while true; do
+        for WATCH_FILE in "$WATCH_FILES[@]"; do
+            # if the file is not there, create
+            if [ ! -e "$WATCH_FILE" ]; then
+                echo "    +-- watch file missing, creating: $WATCH_FILE"
+                touch "$WATCH_FILE"
+            fi
+        done
+        # wait for events
+        inotifywait -r -e modify -e move -e create -e delete -qq "$WATCH_FILES[@]"
+        # if a watched event occured, send the signal
+        if [ $? -eq 0 ]; then
+            echo "    +-- watch file changed, sending USR1 to php-fpm (pid $( cat "$PHP_PID_FILE" ))..."
+            kill -USR1 "$( cat "$PHP_PID_FILE" )"
+        fi
+    done
+}
+
 # we need root
 if [[ `whoami` != "root" ]]; then
   echo "we need root, and we are: $( whoami ); exiting!.."
@@ -13,11 +49,15 @@ if [[ "$PHP_APP_NAME" == "" || "$PHP_APP_USER" == "" || "$PHP_APP_GROUP" == "" |
 fi
 
 # info
-echo "\$PHP_APP_NAME  :: $PHP_APP_NAME"
-echo "\$PHP_APP_USER  :: $PHP_APP_USER"
-echo "\$PHP_APP_GROUP :: $PHP_APP_GROUP"
-echo "\$PHP_APP_DIR   :: $PHP_APP_DIR"
-echo "\$PHP_LISTEN    :: $PHP_LISTEN"
+echo "\$PHP_APP_NAME   :: $PHP_APP_NAME"
+echo "\$PHP_APP_USER   :: $PHP_APP_USER"
+echo "\$PHP_APP_GROUP  :: $PHP_APP_GROUP"
+echo "\$PHP_APP_DIR    :: $PHP_APP_DIR"
+echo "\$PHP_LISTEN     :: $PHP_LISTEN"
+echo "\$PHP_ACCESS_LOG :: $PHP_ACCESS_LOG"
+echo "\$PHP_ERROR_LOG  :: $PHP_ERROR_LOG"
+echo "\$PHP_SLOW_LOG   :: $PHP_SLOW_LOG"
+echo "\$PHP_PID_FILE   :: $PHP_PID_FILE"
 
 # do we have UID/GID number given explicitly?
 if [[ "$PHP_APP_UID" != "" ]]; then
@@ -129,8 +169,13 @@ else
     sed -i -r -e "s/^slowlog = .*$/slowlog = \"$PHP_SLOW_LOG\"/g" /etc/php5/fpm/pool.d/$PHP_APP_NAME.conf
 fi
 
-# Change the default access, error, and slowlog locations.
+# Change the default error location.
 sed -i "s@error_log = /var/log/php5-fpm.log@error_log = '$PHP_ERROR_LOG'@g" /etc/php5/fpm/php-fpm.conf
+
+# Change the default pidfile location.
+sed -i "s@pid = .*@pid = '$PHP_PID_FILE'@g" /etc/php5/fpm/php-fpm.conf
+
+watch_logfiles "$PHP_ACCESS_LOG" "$PHP_ERROR_LOG" "$PHP_SLOW_LOG"
 
 # let's run the darn thing
 exec /usr/sbin/php5-fpm -F --fpm-config /etc/php5/fpm/php-fpm.conf
