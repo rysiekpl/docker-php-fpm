@@ -89,3 +89,5 @@ Access, [error](http://php.net/manual/en/errorfunc.configuration.php#ini.error-l
  - `PHP_PID_FILE` (default: `"/var/run/php5-fpm.pid"`)
 
 The `php-fpm` pidfile location.
+
+**Caveat:** if `/etc/php5/fpm/pool.d/$PHP_APP_NAME.conf` config file is found (say, volume-mounted into the container), all $PHP_* vars are ignored. Some, however (notably: `PHP_PID_FILE` and `PHP_ERROR_LOG`) are not set in that file, and need to be set in `/etc/php5/fpm/php-fpm.conf` file.
