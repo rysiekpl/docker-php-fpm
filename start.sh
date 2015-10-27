@@ -1,42 +1,74 @@
 #!/bin/bash
 
-# this waits for changes in files passed in params and sends php-fpm a USR1 signal to reload the logfiles
+#
+# this waits for changes in files passed in params and sends php-fpm a USR1
+# signal to reload the logfiles
+#
+# we need to watch the containing directories and filter events by files, as
+# when a file is open while being deleted (as it happens with php-fpm
+# logfiles), inotify fails to register a delete_self event, for some reason.
+#
 function watch_logfiles {
 
     # inform
     echo "+-- watching for changes in watchfile(s):"
 
-    # get the watch files
+    # prepare the watch files array
     unset WATCH_FILES
     WATCH_FILES=()
+    
+    # build the egrep filter
+    # start off with the general events happening directly on watched directories
+    EGREP_FILTER="^(.+ (DELETE_SELF|MOVE_SELF|UNMOUNT)"
+    
+    # get the watch files; filter out `/dev/null`s we don't need
     for WATCH_FILE in "$@"; do
         if [ ! $WATCH_FILE = "/dev/null" ]; then
             WATCH_FILES+=("$WATCH_FILE")
             echo "    +-- $WATCH_FILE"
+            # add filter for the particular filee in its directory
+            # TODO: escape regex special chars in filenames!
+            EGREP_FILTER="${EGREP_FILTER}|$( dirname "$WATCH_FILE" )/ (MOVED_FROM|DELETE) $( basename "$WATCH_FILE" )"
         fi
     done
+    
+    # finish the regex with a nice dollar sign
+    EGREP_FILTER="$EGREP_FILTER)$"
 
     # loopy-loop!
-    # FIXME we need to handle SIGHUP/SIGTERM/SIGKILL nicely some day
     while true; do
-	echo "    +-- checking watchfiles..."
+        echo "    +-- checking watchfiles..."
         for WATCH_FILE in "${WATCH_FILES[@]}"; do
             # if the file is not there, create
-            if [ ! -e "$WATCH_FILE" ]; then
-                echo "        +-- waiting for missing watch file: $WATCH_FILE"
+            if [ ! -e "$( dirname "$WATCH_FILE" )" ]; then
+                echo "        +-- waiting for missing watch file directory: $( dirname "$WATCH_FILE" )"
                 sleep 1
-                continue 2 # we want the outer loop to continue
+                continue 2 # we want to break out to the outer loop, and then to continue
             fi
         done
-	echo "    +-- watchfiles ok, setting the watches for ${WATCH_FILES[*]}"
-        # wait for events
-	echo inotifywait -e delete_self -e move_self -e unmount "${WATCH_FILES[@]}"
-        inotifywait -e delete_self -e move_self -e unmount "${WATCH_FILES[@]}"
-        # if a watched event occured, send the signal
-        if [ $? -eq 0 ]; then
-            echo "    +-- watch file changed, sending USR1 to php-fpm (pid $( cat "$PHP_PID_FILE" ))..."
-            kill -USR1 "$( cat "$PHP_PID_FILE" )"
-        fi
+        echo "    +-- watchfiles ok, setting the watches for dirs containing ${WATCH_FILES[*]}"
+        
+        # monitor for events on directories *containing* the files we want to watch
+        # grep only the events we want
+        # and then act upon them
+        #
+        # using pure egrep confuses read in the next piped step, so we need to work
+        # around that via a minimal while look; not elegant, but works
+        inotifywait -m \
+            -e delete_self \
+            -e move_self \
+            -e unmount \
+            -e delete \
+            -e moved_from \
+            -q $( dirname "${WATCH_FILES[@]}" ) \
+            |   while true; do egrep -m 1 "$EGREP_FILTER"; done \
+            |   while true; do
+                    read -r AN_EVENT
+                    echo "    +-- event: $AN_EVENT"
+                    echo "        sending USR1 to php-fpm (pid $( cat "$PHP_PID_FILE" ))..."
+                    kill -USR1 "$( cat "$PHP_PID_FILE" )"
+                    # TODO handle DELETE_SELF, MOVE_SELF, UNMOUNT
+                done
     done
 }
 
