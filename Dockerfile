@@ -15,15 +15,15 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get -y upgrade && apt-g
 # Change the following to rename your app or change the user and group the app will run
 # with. I don't recommend modifying the user and group but there's no problem in changing
 # the app name.
-ENV PHP_APP_NAME    "www"
-ENV PHP_APP_USER    "www-data"
-ENV PHP_APP_GROUP   "www-data"
-ENV PHP_APP_DIR     "/opt/php/"
-ENV PHP_LISTEN      "[::]:9000"
-ENV PHP_ACCESS_LOG  "/dev/null"
-ENV PHP_ERROR_LOG   "/dev/null"
-ENV PHP_SLOW_LOG    "/dev/null"
-ENV PHP_PID_FILE    "/var/run/php5-fpm.pid"
+ENV PHP_APP_NAME="www" \
+    PHP_APP_USER="www-data" \
+    PHP_APP_GROUP="www-data" \
+    PHP_APP_DIR="/opt/php/" \
+    PHP_LISTEN="[::]:9000" \
+    PHP_ACCESS_LOG="/dev/null" \
+    PHP_ERROR_LOG="/dev/null" \
+    PHP_SLOW_LOG="/dev/null" \
+    PHP_PID_FILE="/var/run/php5-fpm.pid"
 
 # clean up the pool config directory
 RUN rm -rf /etc/php5/fpm/pool.d/*
