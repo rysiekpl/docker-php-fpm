@@ -32,6 +32,12 @@ function watch_logfiles {
         fi
     done
     
+    # do we actually have any files to watch?
+    if [ ${#WATCH_FILES[@]} = 0 ]; then 
+        echo "    +-- no files to watch."
+        return 0
+    fi
+    
     # finish the regex with a nice dollar sign
     EGREP_FILTER="$EGREP_FILTER)$"
 
