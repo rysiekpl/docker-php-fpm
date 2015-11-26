@@ -122,12 +122,9 @@ if [[ "$PHP_APP_GID" != "" ]]; then
   echo "\$PHP_APP_GID   :: $PHP_APP_GID"
 fi
 
-  
-# get group data, if any
-GROUP_DATA=`getent group "$PHP_APP_GROUP"`
 
-# does the group exist?
-if test $? -eq 0; then
+# get group data, if any, and check if the group exists
+if GROUP_DATA=`getent group "$PHP_APP_GROUP"`; then
   # it does! do we have the gid given?
   if [[ "$PHP_APP_GID" != "" ]]; then
     # we do! do these match?
@@ -145,7 +142,7 @@ else
   GID_ARGS=""
   if [[ "$PHP_APP_GID" != "" ]]; then
     # we do! does a group with a given id exist?
-    if `getent group "$PHP_APP_GID"`; then
+    if getent group "$PHP_APP_GID" >/dev/null; then
       echo "ERROR: a group with a given id ($PHP_APP_GID) already exists, can't create group $PHP_APP_GROUP with this id"
       exit 4
     fi
@@ -157,11 +154,9 @@ else
   groupadd $GID_ARGS "$PHP_APP_GROUP"
 fi
 
-# get user data, if any
-USER_DATA=`id -i "$PHP_APP_USER" 2>/dev/null`
 
-# does the user exist?
-if test $? -eq 0; then
+# get user data, if any, and check if the user exists
+if USER_DATA=`id -u "$PHP_APP_USER" 2>/dev/null`; then
   # it does! do we have the uid given?
   if [[ "$PHP_APP_UID" != "" ]]; then
     # we do! do these match?
@@ -181,7 +176,7 @@ else
   UID_ARGS=""
   if [[ "$PHP_APP_UID" != "" ]]; then
     # we do! does a group with a given id exist?
-    if `getent passwd "$PHP_APP_UID"`; then
+    if getent passwd "$PHP_APP_UID" >/dev/null; then
       echo "ERROR: a user with a given id ($PHP_APP_UID) already exists, can't create user $PHP_APP_USER with this id"
       exit 6
     fi
