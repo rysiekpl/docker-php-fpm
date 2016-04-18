@@ -191,6 +191,10 @@ fi
 # do we need particular packages installed?
 if [ ! -z ${INSTALL_PACKAGES+x} ]; then
   # aye, install them
+  echo
+  echo "* * * WARNING: INSTALL_PACKAGES envvar support is deprecated and will soon be removed!"
+  echo "* * * WARNING: use INSTALL_PACKAGES build arg instead!"
+  echo
   DEBIAN_FRONTEND=noninteractive apt-get -q update && apt-get -q -y --no-install-recommends install $INSTALL_PACKAGES && apt-get -q clean && apt-get -q -y autoremove
 fi
 

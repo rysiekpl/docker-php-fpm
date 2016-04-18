@@ -26,16 +26,19 @@ docker run \
     -e PHP_APP_LISTEN=/var/run/php/myapp.socket \
     -e PHP_APP_DIR=/opt/myapp/
     -e PHP_ERROR_LOG="/var/log/myapp/error.log" \
-    -e INSTALL_PACKAGES="php5-intl php5-ming" \
+    --build-arg INSTALL_PACKAGES="php5-intl php5-ming" \
     -v "/path/to/code/:/opt/myapp/:ro" \
     docker-php-rpm
 ```
 
-And with `docker-compose`:
+And with `docker-compose` ([v.2](https://docs.docker.com/compose/compose-file/#version-2)):
 
 ```
 php.myapp:
-    build: docker-php-fpm/
+    build: 
+        context: docker-php-fpm/
+        args:
+            INSTALL_PACKAGES: "php5-intl php5-ming"
     environment:
         PHP_APP_NAME:     "myapp"
         PHP_APP_USER:     "myapp_user"
@@ -43,10 +46,17 @@ php.myapp:
         PHP_APP_LISTEN:   "/var/run/php/myapp.socket"
         PGP_APP_DIR:      "/opt/myapp/"
         PHP_ERROR_LOG:    "/var/log/myapp/error.log"
-        INSTALL_PACKAGES: "php5-intl php5-ming"
     volumes:
         - ""/path/to/code/:/opt/myapp/:ro""
 ```
+
+## [Build-time variables](https://docs.docker.com/engine/reference/commandline/build/#set-build-time-variables-build-arg)
+
+ - `INSTALL_PACKAGES`
+
+List of packages to `apt-get install` during build, to be used as an alternative to forking this image or using it in the Dockerfile `FROM` clause.
+
+This is the preferred way of installing additional packages (compare: `INSTALL_PACKAGES` environment variable).
 
 ## Environment variables
 
@@ -78,7 +88,7 @@ Directory with code to run.
 
 What interface to listen on -- compatible with the `listen` directive of the `php.ini` config file: can be either an `IP:PORT` combination, only a `PORT`, or a `/path/to/unix/socket`.
 
- - `INSTALL_PACKAGES`
+ - `INSTALL_PACKAGES` (**deprecated** -- use `INSTALL_PACKAGES` build arg instead)
 
 List of packages to `apt-get install` during startup, to be used as an alternative to forking this image or using it in the Dockerfile `FROM` clause.
 

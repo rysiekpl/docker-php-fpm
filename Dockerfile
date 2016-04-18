@@ -25,6 +25,15 @@ ENV PHP_APP_NAME="www" \
     PHP_SLOW_LOG="/dev/null" \
     PHP_PID_FILE="/var/run/php5-fpm.pid"
 
+# we might need to install some packages, but doing this in the entrypoint doesn't make any sense
+ARG INSTALL_PACKAGES=
+RUN if [ "$INSTALL_PACKAGES" != "" ]; then \
+        export DEBIAN_FRONTEND=noninteractive && apt-get update && apt-get install -y \
+            $INSTALL_PACKAGES \
+            --no-install-recommends && \
+        rm -rf /var/lib/apt/lists/* ; \
+    fi
+    
 # clean up the pool config directory
 RUN rm -rf /etc/php5/fpm/pool.d/*
 
