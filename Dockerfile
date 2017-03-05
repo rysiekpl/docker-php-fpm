@@ -6,9 +6,22 @@ MAINTAINER Michał "rysiek" Woźniak <rysiek@hackerspace.pl>
 
 # Packages to install on the container.
 # FIXME: check if everything here is actually needed
-RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get -y upgrade && apt-get install -y \
-  php5-fpm php5-curl php5-gd php5-imagick php5-imap php5-json php5-mcrypt php5-mysql \
-  php5-xcache php5-xmlrpc php5-xsl php5-geoip inotify-tools --no-install-recommends && \
+RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
+    apt-get -y upgrade && \
+    apt-get install -y --no-install-recommends \
+        php5-fpm \
+        php5-curl \
+        php5-gd \
+        php5-imagick \
+        php5-imap \
+        php5-json \
+        php5-mcrypt \
+        php5-mysql \
+        php5-xcache \
+        php5-xmlrpc \
+        php5-xsl \
+        php5-geoip \
+        inotify-tools && \
   apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Define environment variables.
@@ -46,6 +59,8 @@ COPY start.sh /var/lib/php5/start
 # make sure the PHP dir exists
 # TODO: ONBUILD?
 RUN mkdir $PHP_APP_DIR && chown $APP_USER:$APP_GROUP $PHP_APP_DIR
+ONBUILD COPY . $PHP_APP_DIR
+ONBUILD RUN chown $APP_USER:$APP_GROUP $PHP_APP_DIR
 
 # volumes
 VOLUME ["/var/run/php-fpm", "/var/log/php-fpm", "/etc/php5", "/opt/php/"]
