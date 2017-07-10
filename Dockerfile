@@ -58,9 +58,9 @@ COPY start.sh /var/lib/php5/start
 
 # make sure the PHP dir exists
 # TODO: ONBUILD?
-RUN mkdir $PHP_APP_DIR && chown $APP_USER:$APP_GROUP $PHP_APP_DIR
+RUN mkdir $PHP_APP_DIR && chown $PHP_APP_USER:$PHP_APP_GROUP $PHP_APP_DIR
 ONBUILD COPY . $PHP_APP_DIR
-ONBUILD RUN chown $APP_USER:$APP_GROUP $PHP_APP_DIR
+ONBUILD RUN chown $PHP_APP_USER:$PHP_APP_GROUP $PHP_APP_DIR
 
 # volumes
 VOLUME ["/var/run/php-fpm", "/var/log/php-fpm", "/etc/php5", "/opt/php/"]
