@@ -55,6 +55,7 @@ COPY pool.conf /etc/php5/fpm/pool.d/pool.conf
 
 # startup wrapper
 COPY start.sh /var/lib/php5/start
+RUN chmod a+x /var/lib/php5/start
 
 # make sure the PHP dir exists
 # TODO: ONBUILD?
@@ -68,5 +69,5 @@ VOLUME ["/var/run/php-fpm", "/var/log/php-fpm", "/etc/php5", "/opt/php/"]
 # expose
 EXPOSE 9000
 
-CMD ["/var/lib/php5/start"]
-ENTRYPOINT ["/bin/bash"]
+ENTRYPOINT ["/var/lib/php5/start"]
+CMD ["/usr/sbin/php5-fpm", "-F", "--fpm-config", "/etc/php5/fpm/php-fpm.conf"]

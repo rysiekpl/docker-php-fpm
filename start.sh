@@ -242,4 +242,6 @@ watch_logfiles "$PHP_ACCESS_LOG" "$PHP_ERROR_LOG" "$PHP_SLOW_LOG" &
 sleep 1
 
 # let's run the darn thing
-exec /usr/sbin/php5-fpm -F --fpm-config /etc/php5/fpm/php-fpm.conf
+echo "+-- running command:"
+echo "    $@"
+exec "$@"
