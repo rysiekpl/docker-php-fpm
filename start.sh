@@ -241,7 +241,10 @@ fi
 watch_logfiles "$PHP_ACCESS_LOG" "$PHP_ERROR_LOG" "$PHP_SLOW_LOG" &
 sleep 1
 
-# let's run the darn thing
-echo "+-- running command:"
-echo "    $@"
-exec "$@"
+# let's run the darn thing,
+# if there is anything to run that is
+if [ $# -eq 0 ]; then
+    echo "+-- running command:"
+    echo "    $@"
+    exec "$@"
+fi
