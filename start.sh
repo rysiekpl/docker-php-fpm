@@ -179,7 +179,7 @@ else
     if getent passwd "$PHP_APP_UID" >/dev/null; then
       echo "ERROR: a user with a given id ($PHP_APP_UID) already exists, can't create user $PHP_APP_USER with this id"
       exit 6
-    fi
+    fi 
     # prepare the fragment of the useradd command
     UID_ARGS="-u $PHP_APP_UID"
   fi
@@ -207,44 +207,47 @@ chown $PHP_APP_USER:$PHP_APP_GROUP /var/run/php-fpm
 chown $PHP_APP_USER:$PHP_APP_GROUP $PHP_APP_DIR
 
 # PHP-FPM pool configuration.
-# expects configuration in /etc/php5/fpm/pool.d/$PHP_APP_NAME.conf file
-if [ -s /etc/php5/fpm/pool.d/$PHP_APP_NAME.conf ]; then
-    echo "config file /etc/php5/fpm/pool.d/$PHP_APP_NAME.conf found, ignoring any PHP_* env vars!"
+# expects configuration in /etc/php/7.0/fpm/pool.d/$PHP_APP_NAME.conf file
+if [ -s /etc/php/7.0/fpm/pool.d/$PHP_APP_NAME.conf ]; then
+    echo "config file /etc/php/7.0/fpm/pool.d/$PHP_APP_NAME.conf found, ignoring any PHP_* env vars!"
 else
     # if that file does not exist or is empty, it creates it with config from envvars
-    echo "config file /etc/php5/fpm/pool.d/$PHP_APP_NAME.conf not found, setting up from PHP_* env vars!"
-    mv /etc/php5/fpm/pool.d/pool.conf /etc/php5/fpm/pool.d/$PHP_APP_NAME.conf
+    echo "config file /etc/php/7.0/fpm/pool.d/$PHP_APP_NAME.conf not found, setting up from PHP_* env vars!"
+    mv /etc/php/7.0/fpm/pool.d/pool.conf /etc/php/7.0/fpm/pool.d/$PHP_APP_NAME.conf
     echo "+-- pool name..."
-    sed -i "s/pool_name/$PHP_APP_NAME/g" /etc/php5/fpm/pool.d/$PHP_APP_NAME.conf
+    sed -i "s/pool_name/$PHP_APP_NAME/g" /etc/php/7.0/fpm/pool.d/$PHP_APP_NAME.conf
     echo "+-- user..."
-    sed -i "s/app_user/$PHP_APP_USER/g" /etc/php5/fpm/pool.d/$PHP_APP_NAME.conf
+    sed -i "s/app_user/$PHP_APP_USER/g" /etc/php/7.0/fpm/pool.d/$PHP_APP_NAME.conf
     echo "+-- group..."
-    sed -i "s/app_group/$PHP_APP_GROUP/g" /etc/php5/fpm/pool.d/$PHP_APP_NAME.conf
+    sed -i "s/app_group/$PHP_APP_GROUP/g" /etc/php/7.0/fpm/pool.d/$PHP_APP_NAME.conf
     echo "+-- listen..."
-    sed -i -r -e "s@^listen = .*@listen = $PHP_LISTEN@g" /etc/php5/fpm/pool.d/$PHP_APP_NAME.conf
+    sed -i -r -e "s@^listen = .*@listen = $PHP_LISTEN@g" /etc/php/7.0/fpm/pool.d/$PHP_APP_NAME.conf
     # access and slowlog locations
     echo "+-- access log..."
-    sed -i -r -e "s@^access\.log = .*@access.log = \"$PHP_ACCESS_LOG\"@g" /etc/php5/fpm/pool.d/$PHP_APP_NAME.conf
+    sed -i -r -e "s@^access\.log = .*@access.log = \"$PHP_ACCESS_LOG\"@g" /etc/php/7.0/fpm/pool.d/$PHP_APP_NAME.conf
     echo "+-- slowlog..."
-    sed -i -r -e "s@^slowlog = .*@slowlog = \"$PHP_SLOW_LOG\"@g" /etc/php5/fpm/pool.d/$PHP_APP_NAME.conf
+    sed -i -r -e "s@^slowlog = .*@slowlog = \"$PHP_SLOW_LOG\"@g" /etc/php/7.0/fpm/pool.d/$PHP_APP_NAME.conf
     
     # Change the default error location.
     echo "+-- error log..."
-    sed -i "s@error_log = /var/log/php5-fpm.log@error_log = \"$PHP_ERROR_LOG\"@g" /etc/php5/fpm/php-fpm.conf
+    sed -i "s@error_log = /var/log/php7.0-fpm.log@error_log = \"$PHP_ERROR_LOG\"@g" /etc/php/7.0/fpm/php-fpm.conf
 
     # Change the default pidfile location.
     echo "+-- pidfile..."
-    sed -i "s@pid = .*@pid = $PHP_PID_FILE@g" /etc/php5/fpm/php-fpm.conf
+    sed -i "s@pid = .*@pid = $PHP_PID_FILE@g" /etc/php/7.0/fpm/php-fpm.conf
 fi
-
-# watch the files
-watch_logfiles "$PHP_ACCESS_LOG" "$PHP_ERROR_LOG" "$PHP_SLOW_LOG" &
-sleep 1
 
 # let's run the darn thing,
 # if there is anything to run that is
-if [ $# -eq 0 ]; then
+if [ $# -ne 0 ]; then
+
+    # watch the files
+    watch_logfiles "$PHP_ACCESS_LOG" "$PHP_ERROR_LOG" "$PHP_SLOW_LOG" &
+    sleep 1
+
     echo "+-- running command:"
     echo "    $@"
     exec "$@"
+else
+    echo "+-- no command specified."
 fi
