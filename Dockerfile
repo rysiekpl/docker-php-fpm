@@ -64,7 +64,7 @@ ONBUILD COPY . $PHP_APP_DIR
 ONBUILD RUN chown $PHP_APP_USER:$PHP_APP_GROUP $PHP_APP_DIR
 
 # volumes
-VOLUME ["/var/run/php-fpm", "/var/log/php-fpm", "/etc/php5", "/opt/php/"]
+VOLUME ["/var/run/php-fpm", "/var/log/php-fpm", "/opt/php/"]
 
 # expose
 EXPOSE 9000

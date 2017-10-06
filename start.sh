@@ -237,14 +237,17 @@ else
     sed -i "s@pid = .*@pid = $PHP_PID_FILE@g" /etc/php5/fpm/php-fpm.conf
 fi
 
-# watch the files
-watch_logfiles "$PHP_ACCESS_LOG" "$PHP_ERROR_LOG" "$PHP_SLOW_LOG" &
-sleep 1
-
 # let's run the darn thing,
 # if there is anything to run that is
-if [ $# -eq 0 ]; then
+if [ $# -ne 0 ]; then
+
+    # watch the files
+    watch_logfiles "$PHP_ACCESS_LOG" "$PHP_ERROR_LOG" "$PHP_SLOW_LOG" &
+    sleep 1
+
     echo "+-- running command:"
     echo "    $@"
     exec "$@"
+else
+    echo "+-- no command specified."
 fi
