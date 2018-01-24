@@ -227,15 +227,15 @@ else
     sed -i -r -e "s@^access\.log = .*@access.log = \"$PHP_ACCESS_LOG\"@g" /etc/php/7.0/fpm/pool.d/$PHP_APP_NAME.conf
     echo "+-- slowlog..."
     sed -i -r -e "s@^slowlog = .*@slowlog = \"$PHP_SLOW_LOG\"@g" /etc/php/7.0/fpm/pool.d/$PHP_APP_NAME.conf
-    
-    # Change the default error location.
-    echo "+-- error log..."
-    sed -i "s@error_log = /var/log/php7.0-fpm.log@error_log = \"$PHP_ERROR_LOG\"@g" /etc/php/7.0/fpm/php-fpm.conf
-
-    # Change the default pidfile location.
-    echo "+-- pidfile..."
-    sed -i "s@pid = .*@pid = $PHP_PID_FILE@g" /etc/php/7.0/fpm/php-fpm.conf
 fi
+
+# Change the default error location.
+echo "+-- error log..."
+sed -i "s@error_log = /var/log/php7.0-fpm.log@error_log = \"$PHP_ERROR_LOG\"@g" /etc/php/7.0/fpm/php-fpm.conf
+
+# Change the default pidfile location.
+echo "+-- pidfile..."
+sed -i "s@pid = .*@pid = $PHP_PID_FILE@g" /etc/php/7.0/fpm/php-fpm.conf
 
 # let's run the darn thing,
 # if there is anything to run that is
