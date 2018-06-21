@@ -84,7 +84,7 @@ If both `PHP_APP_GROUP` and `PHP_APP_GID` are provided, and there is an existing
 
 Directory with code to run.
 
- - `PHP_APP_LISTEN` (default: `"[::]:9000"`)
+ - `PHP_LISTEN` (default: `"[::]:9000"`)
 
 What interface to listen on -- compatible with the `listen` directive of the `php.ini` config file: can be either an `IP:PORT` combination, only a `PORT`, or a `/path/to/unix/socket`.
 
