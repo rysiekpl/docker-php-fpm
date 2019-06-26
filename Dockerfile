@@ -1,4 +1,4 @@
-FROM debian:stretch
+FROM debian:buster
 
 MAINTAINER Michał "rysiek" Woźniak <rysiek@hackerspace.pl>
 # based on https://github.com/leoditommaso/docker_php-fpm/blob/master/Dockerfile
@@ -9,17 +9,17 @@ MAINTAINER Michał "rysiek" Woźniak <rysiek@hackerspace.pl>
 RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
     apt-get -y upgrade && \
     apt-get install -y --no-install-recommends \
-        php7.0-fpm \
-        php7.0-curl \
-        php7.0-gd \
-        php7.0-imagick \
-        php7.0-imap \
-        php7.0-json \
-        php7.0-mcrypt \
-        php7.0-mysql \
-        php7.0-xmlrpc \
-        php7.0-xsl \
-        php7.0-geoip \
+        php7.3-fpm \
+        php7.3-curl \
+        php7.3-gd \
+        php7.3-imagick \
+        php7.3-imap \
+        php7.3-json \
+        php7.3-mcrypt \
+        php7.3-mysql \
+        php7.3-xmlrpc \
+        php7.3-xsl \
+        php7.3-geoip \
         inotify-tools && \
   apt-get clean && rm -rf /var/lib/apt/lists/*
 
@@ -35,7 +35,7 @@ ENV PHP_APP_NAME="www" \
     PHP_ACCESS_LOG="/dev/null" \
     PHP_ERROR_LOG="/dev/null" \
     PHP_SLOW_LOG="/dev/null" \
-    PHP_PID_FILE="/var/run/php7.0-fpm.pid"
+    PHP_PID_FILE="/var/run/php7.3-fpm.pid"
 
 # we might need to install some packages, but doing this in the entrypoint doesn't make any sense
 ARG INSTALL_PACKAGES=
@@ -47,14 +47,14 @@ RUN if [ "$INSTALL_PACKAGES" != "" ]; then \
     fi
     
 # clean up the pool config directory
-RUN rm -rf /etc/php/7.0/fpm/pool.d/*
+RUN rm -rf /etc/php/7.3/fpm/pool.d/*
 
 # default pool config file
-COPY pool.conf /etc/php/7.0/fpm/pool.d/pool.conf
+COPY pool.conf /etc/php/7.3/fpm/pool.d/pool.conf
 
 # startup wrapper
-COPY start.sh /var/lib/php7.0/start
-RUN chmod a+x /var/lib/php7.0/start
+COPY start.sh /var/lib/php7.3/start
+RUN chmod a+x /var/lib/php7.3/start
 
 # make sure the PHP dir exists
 # TODO: ONBUILD?
@@ -69,5 +69,5 @@ VOLUME ["/var/run/php-fpm", "/var/log/php-fpm", "/opt/php/"]
 
 EXPOSE 9000
 
-ENTRYPOINT ["/var/lib/php7.0/start"]
-CMD ["/usr/sbin/php-fpm7.0", "-F", "--fpm-config", "/etc/php/7.0/fpm/php-fpm.conf"]
+ENTRYPOINT ["/var/lib/php7.3/start"]
+CMD ["/usr/sbin/php-fpm7.3", "-F", "--fpm-config", "/etc/php/7.3/fpm/php-fpm.conf"]
