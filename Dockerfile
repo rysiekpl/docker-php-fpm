@@ -15,6 +15,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
         php7.0-imagick \
         php7.0-imap \
         php7.0-json \
+        php7.0-mbstring \
         php7.0-mcrypt \
         php7.0-mysql \
         php7.0-xmlrpc \
