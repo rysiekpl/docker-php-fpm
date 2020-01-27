@@ -100,6 +100,10 @@ This packages *will be installed each time the docker container is recreated*, s
 
 Access, [error](http://php.net/manual/en/errorfunc.configuration.php#ini.error-log), and slowlog locations, accordingly. By default all are set to `/dev/null`.
 
+ - `PHP_SLOW_LOG_TIMEOUT` (default: `"5s"`)
+
+Timeout after which PHP will dump the backtrace to slowlog.
+
  - `PHP_PID_FILE` (default: `"/var/run/php5-fpm.pid"`)
 
 The `php-fpm` pidfile location.

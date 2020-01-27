@@ -35,6 +35,7 @@ ENV PHP_APP_NAME="www" \
     PHP_ACCESS_LOG="/dev/null" \
     PHP_ERROR_LOG="/dev/null" \
     PHP_SLOW_LOG="/dev/null" \
+    PHP_SLOW_LOG_TIMEOUT="5s" \
     PHP_PID_FILE="/var/run/php7.3-fpm.pid"
 
 # we might need to install some packages, but doing this in the entrypoint doesn't make any sense

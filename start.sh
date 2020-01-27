@@ -104,22 +104,23 @@ if [[ "$PHP_APP_NAME" == "" || "$PHP_APP_USER" == "" || "$PHP_APP_GROUP" == "" |
 fi
 
 # info
-echo "\$PHP_APP_NAME   :: $PHP_APP_NAME"
-echo "\$PHP_APP_USER   :: $PHP_APP_USER"
-echo "\$PHP_APP_GROUP  :: $PHP_APP_GROUP"
-echo "\$PHP_APP_DIR    :: $PHP_APP_DIR"
-echo "\$PHP_LISTEN     :: $PHP_LISTEN"
-echo "\$PHP_ACCESS_LOG :: $PHP_ACCESS_LOG"
-echo "\$PHP_ERROR_LOG  :: $PHP_ERROR_LOG"
-echo "\$PHP_SLOW_LOG   :: $PHP_SLOW_LOG"
-echo "\$PHP_PID_FILE   :: $PHP_PID_FILE"
+echo "\$PHP_APP_NAME         :: $PHP_APP_NAME"
+echo "\$PHP_APP_USER         :: $PHP_APP_USER"
+echo "\$PHP_APP_GROUP        :: $PHP_APP_GROUP"
+echo "\$PHP_APP_DIR          :: $PHP_APP_DIR"
+echo "\$PHP_LISTEN           :: $PHP_LISTEN"
+echo "\$PHP_ACCESS_LOG       :: $PHP_ACCESS_LOG"
+echo "\$PHP_ERROR_LOG        :: $PHP_ERROR_LOG"
+echo "\$PHP_SLOW_LOG         :: $PHP_SLOW_LOG"
+echo "\$PHP_SLOW_LOG_TIMEOUT :: $PHP_SLOW_LOG_TIMEOUT"
+echo "\$PHP_PID_FILE         :: $PHP_PID_FILE"
 
 # do we have UID/GID number given explicitly?
 if [[ "$PHP_APP_UID" != "" ]]; then
-  echo "\$PHP_APP_UID   :: $PHP_APP_UID"
+  echo "\$PHP_APP_UID          :: $PHP_APP_UID"
 fi
 if [[ "$PHP_APP_GID" != "" ]]; then
-  echo "\$PHP_APP_GID   :: $PHP_APP_GID"
+  echo "\$PHP_APP_GID          :: $PHP_APP_GID"
 fi
 
 
@@ -227,6 +228,8 @@ else
     sed -i -r -e "s@^access\.log = .*@access.log = \"$PHP_ACCESS_LOG\"@g" /etc/php/7.3/fpm/pool.d/$PHP_APP_NAME.conf
     echo "+-- slowlog..."
     sed -i -r -e "s@^slowlog = .*@slowlog = \"$PHP_SLOW_LOG\"@g" /etc/php/7.3/fpm/pool.d/$PHP_APP_NAME.conf
+    echo "+-- slowlog timeout..."
+    sed -i -r -e "s@^request_slowlog_timeout = .*@request_slowlog_timeout = \"$PHP_SLOW_LOG_TIMEOUT\"@g" /etc/php/7.3/fpm/pool.d/$PHP_APP_NAME.conf
 fi
 
 # Change the default error location.
